@@ -10,9 +10,11 @@ const createRide = async (req, res) => {
             from,
             to,
             date,
+            time,
             seats
         } = req.body;
 
+        const rideDate = new Date(`${date}T${time}:00`);
 
         const event = await prisma.event.findUnique({
             where:{
@@ -33,7 +35,7 @@ const createRide = async (req, res) => {
             data:{
                 from,
                 to,
-                date:new Date(date),
+                date:rideDate,
                 seats,
                 eventId,
                 driverId:req.user.id

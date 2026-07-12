@@ -9,9 +9,11 @@ const createEvent = async (req, res) => {
             title,
             description,
             location,
-            date
+            date,
+            time
         } = req.body;
 
+        const eventDate = new Date(`${date}T${time}:00`);
 
         const event = await prisma.event.create({
 
@@ -19,7 +21,7 @@ const createEvent = async (req, res) => {
                 title,
                 description,
                 location,
-                date: new Date(date),
+                date:eventDate,
                 creatorId: req.user.id
             }
 

@@ -6,7 +6,11 @@ const {
 } = require("../controllers/event.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
+const validate = require("../middleware/validate.middleware");
 
+const {
+    createEventSchema
+} = require("../validators/event.validator");
 
 const router = express.Router();
 
@@ -15,6 +19,7 @@ const router = express.Router();
 router.post(
     "/",
     authMiddleware,
+    validate(createEventSchema),
     createEvent
 );
 
