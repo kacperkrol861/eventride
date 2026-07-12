@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id       Int @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     String @default("USER")
+
+  events Event[]
+  rides Ride[]
+  requests RideRequest[]
+
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id          Int @id @default(autoincrement())
+
+  title       String
+  description String?
+  location    String
+  date        DateTime
+
+  creatorId   Int
+  creator     User @relation(fields: [creatorId], references: [id])
+
+  rides Ride[]
+
+  createdAt   DateTime @default(now())
+}
+
+model Ride {
+
+  id Int @id @default(autoincrement())
+
+  from String
+  to String
+
+  date DateTime
+
+  seats Int
+
+
+  driverId Int
+  driver User @relation(fields: [driverId], references: [id])
+
+
+  eventId Int
+  event Event @relation(fields: [eventId], references: [id])
+
+  requests RideRequest[]
+  
+  createdAt DateTime @default(now())
+}
+
+model RideRequest {
+
+  id Int @id @default(autoincrement())
+
+
+  status String @default("PENDING")
+
+
+  userId Int
+  user User @relation(fields:[userId], references:[id])
+
+
+  rideId Int
+  ride Ride @relation(fields:[rideId], references:[id])
+
+
+  createdAt DateTime @default(now())
+}
