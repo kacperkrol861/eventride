@@ -71,7 +71,7 @@ const login = async (req, res) => {
 
 
         if(!user){
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "Nieprawidłowy email lub hasło"
             });
         }
@@ -84,7 +84,7 @@ const login = async (req, res) => {
 
 
         if(!passwordMatch){
-            return res.status(400).json({
+            return res.status(401).json({
                 message: "Nieprawidłowy email lub hasło"
             });
         }

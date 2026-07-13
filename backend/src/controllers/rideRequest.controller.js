@@ -197,6 +197,30 @@ const rejectRequest = async (req,res)=>{
         const requestId = Number(req.params.id);
 
 
+        const request = await prisma.rideRequest.findUnique({
+            where:{
+                id:requestId
+            },
+            include:{
+                ride:true
+            }
+        });
+
+
+        if(!request){
+            return res.status(404).json({
+                message:"Nie znaleziono prośby"
+            });
+        }
+
+
+        if(request.ride.driverId !== req.user.id){
+            return res.status(403).json({
+                message:"Nie jesteś właścicielem przejazdu"
+            });
+        }
+
+
         const updated = await prisma.rideRequest.update({
 
             where:{

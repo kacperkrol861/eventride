@@ -2,7 +2,8 @@ const express = require("express");
 
 const {
     createEvent,
-    getEvents
+    getEvents,
+    deleteEvent
 } = require("../controllers/event.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -29,6 +30,10 @@ router.get(
     getEvents
 );
 
-
+router.delete(
+    "/:id",
+    authMiddleware,
+    deleteEvent
+);
 
 module.exports = router;

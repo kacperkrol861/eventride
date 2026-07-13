@@ -78,9 +78,61 @@ const getEvents = async (req,res)=>{
 
 };
 
+const deleteEvent = async (req, res) => {
+
+    try {
+
+        const eventId = Number(req.params.id);
+
+
+        const event = await prisma.event.findUnique({
+            where:{
+                id:eventId
+            }
+        });
+
+
+        if(!event){
+            return res.status(404).json({
+                message:"Wydarzenie nie istnieje"
+            });
+        }
+
+
+        if(event.creatorId !== req.user.id){
+
+            return res.status(403).json({
+                message:"Nie możesz usunąć tego wydarzenia"
+            });
+
+        }
+
+
+        await prisma.event.delete({
+            where:{
+                id:eventId
+            }
+        });
+
+
+        res.json({
+            message:"Wydarzenie usunięte"
+        });
+
+
+    }catch(error){
+
+        res.status(500).json({
+            error:error.message
+        });
+
+    }
+
+};
 
 
 module.exports = {
     createEvent,
-    getEvents
+    getEvents,
+    deleteEvent
 };
