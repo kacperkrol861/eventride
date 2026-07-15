@@ -9,10 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@iconify/vue": "^5.0.1",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
     "@vueuse/core": "^14.3.0",
     "axios": "^1.18.1",
+    "leaflet": "^1.9.4",
     "pinia": "^3.0.4",
     "vue": "^3.5.39",
+    "vue-leaflet": "^0.1.0",
     "vue-router": "^5.1.0",
     "vuestic-ui": "^1.10.3"
   },
