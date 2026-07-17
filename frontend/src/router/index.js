@@ -13,8 +13,8 @@ import DashboardView from "../views/dashboard/DashboardView.vue";
 import EventsView from "../views/events/EventsView.vue";
 import EventDetailsView from "../views/events/EventDetailsView.vue";
 import CreateEventView from "../views/events/CreateEventView.vue";
-
-
+import RideDetailView from "../views/rides/RideDetailView.vue";
+import RideView from "../views/rides/RideView.vue";
 const router = createRouter({
 
     history:createWebHistory(),
@@ -80,8 +80,16 @@ const router = createRouter({
                 {
                     path:"events/:id",
                     component:EventDetailsView
-                }
+                },
 
+                {
+                    path:"rides/:id",
+                    component:RideDetailView
+                },
+                {
+                    path:"rides",
+                    component:RideView
+                }
 
             ]
 

@@ -1,9 +1,12 @@
 <template>
+
   <VaCard class="ride-card">
 
     <VaCardContent>
 
+
       <div class="route">
+
 
         <div class="location">
 
@@ -18,10 +21,12 @@
         </div>
 
 
+
         <Icon
           class="arrow"
           icon="mdi:arrow-right"
         />
+
 
 
         <div class="location">
@@ -36,11 +41,14 @@
 
         </div>
 
+
       </div>
 
 
 
+
       <VaDivider />
+
 
 
 
@@ -50,7 +58,7 @@
         <div class="item">
 
           <Icon
-            icon="mdi:calendar"
+            icon="mdi:calendar-outline"
           />
 
           <span>
@@ -61,6 +69,7 @@
 
 
 
+
         <div class="item">
 
           <Icon
@@ -68,27 +77,48 @@
           />
 
           <span>
-            {{ ride.seats }} seats
+            {{ ride.seats }} seats available
           </span>
 
         </div>
+
 
 
 
         <div class="item">
 
           <Icon
-            icon="mdi:account"
+            icon="mdi:account-circle-outline"
           />
 
           <span>
-            {{ ride.driver?.name }}
+            {{ ride.driver?.name || "Unknown driver" }}
           </span>
 
         </div>
 
 
+
+        <div
+          v-if="ride.event"
+          class="item"
+        >
+
+          <Icon
+            icon="mdi:calendar-star"
+          />
+
+          <span>
+            {{ ride.event.title }}
+          </span>
+
+        </div>
+
+
+
       </div>
+
+
 
 
 
@@ -96,82 +126,250 @@
 
 
         <VaChip
-          color="primary"
+
           size="small"
+
+          :color="availability.color"
+
         >
 
-          Available
+          {{ availability.text }}
 
         </VaChip>
 
 
 
-        <VaButton
-          size="small"
-          color="primary"
-          @click="requestRide"
-        >
 
-          Join ride
 
-        </VaButton>
+        <div class="actions">
+
+
+          <VaButton
+
+            size="small"
+
+            color="secondary"
+
+            @click="viewDetails"
+
+          >
+
+            <Icon
+              icon="mdi:information-outline"
+            />
+
+            View details
+
+          </VaButton>
+
+
+
+
+
+          <VaButton
+
+            size="small"
+
+            color="primary"
+
+            :disabled="ride.seats === 0"
+
+            @click="requestRide"
+
+          >
+
+            <Icon
+              icon="mdi:car-arrow-right"
+            />
+
+            {{ ride.seats === 0 ? "Full" : "Join ride" }}
+
+          </VaButton>
+
+
+        </div>
 
 
       </div>
+
 
 
     </VaCardContent>
 
 
   </VaCard>
+
+
 </template>
+
+
 
 
 <script setup>
 
-import { Icon } from "@iconify/vue";
+
+import {
+  computed
+} from "vue";
+
+
+import {
+  useRouter
+} from "vue-router";
+
+
+import {
+  Icon
+} from "@iconify/vue";
+
+
+
+const router = useRouter();
+
 
 
 const props = defineProps({
 
   ride:{
+
     type:Object,
+
     required:true
+
   }
 
 });
 
 
 
-const formatDate = (date)=>{
+
+
+const availability = computed(()=>{
+
+
+  if(props.ride.seats === 0){
+
+
+    return {
+
+      text:"Full",
+
+      color:"danger"
+
+    };
+
+
+  }
+
+
+
+
+
+  if(props.ride.seats <= 3){
+
+
+    return {
+
+      text:`Only ${props.ride.seats} left`,
+
+      color:"warning"
+
+    };
+
+
+  }
+
+
+
+
+
+  return {
+
+
+    text:"Available",
+
+    color:"success"
+
+
+  };
+
+
+});
+
+
+
+
+
+
+
+const formatDate=(date)=>{
+
 
   return new Date(date)
-    .toLocaleDateString(
+
+    .toLocaleString(
+
       "en-US",
+
       {
+
         day:"numeric",
+
         month:"short",
+
         year:"numeric",
+
         hour:"2-digit",
+
         minute:"2-digit"
+
       }
+
     );
 
+
 };
 
 
 
-const requestRide = ()=>{
 
-  console.log(
-    "Request ride:",
-    props.ride.id
+
+
+const viewDetails = ()=>{
+
+
+  router.push(
+    `/rides/${props.ride.id}`
   );
 
+
 };
+
+
+
+
+
+
+const requestRide=()=>{
+
+
+  console.log(
+
+    "Request ride:",
+
+    props.ride.id
+
+  );
+
+
+};
+
 
 
 </script>
+
+
+
 
 
 
@@ -179,6 +377,7 @@ const requestRide = ()=>{
 
 
 .ride-card {
+
 
   border-radius:18px;
 
@@ -190,13 +389,18 @@ const requestRide = ()=>{
 
 .ride-card:hover {
 
+
   transform:translateY(-5px);
+
 
 }
 
 
 
+
+
 .route {
+
 
   display:flex;
 
@@ -210,35 +414,50 @@ const requestRide = ()=>{
 
 
 
+
+
 .location {
+
 
   display:flex;
 
   align-items:center;
 
-  gap:6px;
+  gap:7px;
 
 }
+
+
 
 
 
 .location svg {
 
+
   color:var(--va-primary);
 
+
 }
+
+
 
 
 
 .arrow {
 
+
   color:#94a3b8;
+
 
 }
 
 
 
+
+
+
 .info {
+
 
   display:flex;
 
@@ -246,11 +465,16 @@ const requestRide = ()=>{
 
   gap:12px;
 
+
 }
 
 
 
+
+
+
 .item {
+
 
   display:flex;
 
@@ -262,21 +486,30 @@ const requestRide = ()=>{
 
   font-size:14px;
 
+
 }
+
+
 
 
 
 .item svg {
 
+
   color:var(--va-primary);
+
 
 }
 
 
 
+
+
+
 .footer {
 
-  margin-top:20px;
+
+  margin-top:25px;
 
   display:flex;
 
@@ -284,7 +517,40 @@ const requestRide = ()=>{
 
   align-items:center;
 
+
 }
+
+
+
+
+
+.actions {
+
+
+  display:flex;
+
+  gap:10px;
+
+}
+
+
+
+
+
+.actions button {
+
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+
+}
+
+
+
 
 
 
@@ -293,21 +559,31 @@ const requestRide = ()=>{
 
 .route {
 
+
   flex-direction:column;
 
   align-items:flex-start;
 
+
 }
+
+
 
 
 .arrow {
 
+
   transform:rotate(90deg);
+
 
 }
 
 
+
+
+
 .footer {
+
 
   flex-direction:column;
 
@@ -315,7 +591,19 @@ const requestRide = ()=>{
 
   align-items:stretch;
 
+
 }
+
+
+
+
+.actions {
+
+
+  flex-direction:column;
+
+}
+
 
 
 }
