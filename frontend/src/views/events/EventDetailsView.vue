@@ -3,10 +3,13 @@
 <div class="event-detail">
 
 
+
 <div
 v-if="requestStatus"
 class="request-overlay"
 >
+
+
 
 
 
@@ -25,6 +28,10 @@ Sending request...
 
 
 </div>
+
+
+
+
 
 
 
@@ -59,30 +66,69 @@ The driver will review your request.
 
 
 
+
+
+
+
 <div
-v-if="requestStatus==='exists'"
+v-if="requestStatus==='warning'"
 class="warning-box"
 >
 
 
 <div class="warning-icon">
 
-<Icon icon="mdi:clock-outline"/>
+<Icon icon="mdi:clock-alert-outline"/>
 
 </div>
 
 
 <h2>
-Request already sent
+Request unavailable
 </h2>
 
 
 <p>
-You are already waiting for driver's response.
+Request already sent or no seats available.
 </p>
 
 
 </div>
+
+
+
+
+
+
+
+
+
+<div
+v-if="requestStatus==='danger'"
+class="danger-box"
+>
+
+
+<div class="danger-icon">
+
+<Icon icon="mdi:account-cancel-outline"/>
+
+</div>
+
+
+<h2>
+Your ride
+</h2>
+
+
+<p>
+You cannot request your own ride.
+</p>
+
+
+</div>
+
+
 
 
 
@@ -109,6 +155,7 @@ You are already waiting for driver's response.
 </p>
 
 
+
 <div class="info">
 
 
@@ -133,12 +180,16 @@ You are already waiting for driver's response.
 
 
 
+
+
 <section class="rides">
 
 
 <h2>
 Available rides
 </h2>
+
+
 
 
 
@@ -167,9 +218,15 @@ v-for="ride in eventRides"
 
 
 
+
+
+
 <div
+
 v-if="!eventRides.length"
+
 class="empty"
+
 >
 
 
@@ -180,7 +237,11 @@ No rides available yet
 
 
 
+
+
 </section>
+
+
 
 
 
@@ -193,39 +254,60 @@ No rides available yet
 
 
 
+
+
+
 <script setup>
 
 
 import {
+
 ref,
+
 computed,
+
 onMounted
+
 } from "vue";
 
 
+
 import {
+
 useRoute
+
 } from "vue-router";
 
 
+
 import {
+
 Icon
+
 } from "@iconify/vue";
 
 
+
 import {
+
 getEvents
+
 } from "@/api/event.api";
 
 
 import {
+
 getRides
+
 } from "@/api/ride.api";
 
 
 import {
+
 createRequest
+
 } from "@/api/request.api";
+
 
 
 import RideCard from "@/components/rides/RideCard.vue";
@@ -233,15 +315,27 @@ import RideCard from "@/components/rides/RideCard.vue";
 
 
 
+
+
+
+
 const route = useRoute();
+
+
 
 
 const event = ref(null);
 
+
 const rides = ref([]);
 
 
+
+
 const requestStatus = ref(null);
+
+
+
 
 
 
@@ -265,33 +359,47 @@ await getRides();
 
 
 
+
 event.value =
+
 eventsResponse.data.find(
+
 e=>e.id == route.params.id
+
 );
 
 
 
 
+
 rides.value =
+
 Array.isArray(ridesResponse.data)
+
 ?
+
 ridesResponse.data
+
 :
+
 [];
 
 
 
 
-}catch(error){
+
+}
+
+catch(error){
 
 console.log(error);
 
 }
 
 
-
 };
+
+
 
 
 
@@ -308,6 +416,7 @@ return [];
 
 
 
+
 return rides.value.filter(
 
 ride=>
@@ -317,8 +426,9 @@ ride.eventId === event.value.id
 );
 
 
-
 });
+
+
 
 
 
@@ -332,12 +442,16 @@ const sendRequest = async(ride)=>{
 try{
 
 
+
 requestStatus.value="loading";
 
 
 
+
 await createRequest(
+
 ride.id
+
 );
 
 
@@ -366,8 +480,10 @@ requestStatus.value=null;
 
 
 
-
 }
+
+
+
 catch(error){
 
 
@@ -377,12 +493,30 @@ console.log(error);
 
 
 
+
+const message =
+
+error.response?.data?.message;
+
+
+
+
+
+
+
+
 if(
-error.response?.data?.message === "Już wysłałeś prośbę"
+
+message === "Już wysłałeś prośbę"
+
+||
+
+message === "Brak wolnych miejsc"
+
 ){
 
 
-requestStatus.value="exists";
+requestStatus.value="warning";
 
 
 
@@ -404,7 +538,45 @@ return;
 
 
 
+
+
+
+
+if(
+
+message === "Nie możesz dołączyć do własnego przejazdu"
+
+){
+
+
+
+requestStatus.value="danger";
+
+
+
+setTimeout(()=>{
+
+
 requestStatus.value=null;
+
+
+},3000);
+
+
+
+return;
+
+
+}
+
+
+
+
+
+
+
+requestStatus.value=null;
+
 
 
 }
@@ -412,6 +584,8 @@ requestStatus.value=null;
 
 
 };
+
+
 
 
 
@@ -427,14 +601,35 @@ if(!date)
 return "";
 
 
+
+
 return new Date(date)
 
 .toLocaleString(
-"pl-PL"
+
+"en-US",
+
+{
+
+
+day:"numeric",
+
+month:"short",
+
+year:"numeric",
+
+hour:"2-digit",
+
+minute:"2-digit"
+
+
+}
+
 );
 
 
 };
+
 
 
 
@@ -452,14 +647,21 @@ onMounted(loadData);
 
 
 
+
+
+
 <style scoped>
 
 
 .event-detail{
 
+
 animation:fade .3s ease;
 
+
 }
+
+
 
 
 
@@ -472,13 +674,16 @@ position:fixed;
 
 inset:0;
 
+
 background:rgba(255,255,255,.96);
+
 
 display:flex;
 
 justify-content:center;
 
 align-items:center;
+
 
 z-index:9999;
 
@@ -490,9 +695,12 @@ z-index:9999;
 
 
 
+
+
 .loader-box,
 .success-box,
-.warning-box{
+.warning-box,
+.danger-box{
 
 
 text-align:center;
@@ -507,6 +715,9 @@ animation:fade .3s ease;
 
 
 
+
+
+
 .spinner{
 
 
@@ -514,18 +725,24 @@ width:70px;
 
 height:70px;
 
+
 border-radius:50%;
+
 
 border:6px solid #ddd;
 
+
 border-top-color:var(--va-primary);
 
+
 animation:spin 1s linear infinite;
+
 
 margin:auto;
 
 
 }
+
 
 
 
@@ -544,12 +761,14 @@ padding:50px;
 
 border-radius:25px;
 
+
 box-shadow:
 
 0 20px 50px rgba(0,0,0,.2);
 
 
 }
+
 
 
 
@@ -564,9 +783,12 @@ background:#f59e0b;
 
 color:white;
 
+
 padding:50px;
 
+
 border-radius:25px;
+
 
 box-shadow:
 
@@ -581,30 +803,70 @@ box-shadow:
 
 
 
+
+.danger-box{
+
+
+background:#dc2626;
+
+color:white;
+
+
+padding:50px;
+
+
+border-radius:25px;
+
+
+box-shadow:
+
+0 20px 50px rgba(0,0,0,.2);
+
+
+}
+
+
+
+
+
+
+
+
 .check,
-.warning-icon{
+.warning-icon,
+.danger-icon{
 
 
 width:80px;
 
+
 height:80px;
+
 
 border-radius:50%;
 
+
 background:white;
+
 
 display:flex;
 
+
 align-items:center;
+
 
 justify-content:center;
 
+
 margin:auto;
+
 
 font-size:45px;
 
 
 }
+
+
 
 
 
@@ -619,7 +881,6 @@ color:#16a34a;
 
 
 
-
 .warning-icon{
 
 color:#f59e0b;
@@ -629,12 +890,48 @@ color:#f59e0b;
 
 
 
+.danger-icon{
+
+color:#dc2626;
+
+}
+
+
+
+
+
+
+
+
+
+.success-box h2,
+.warning-box h2,
+.danger-box h2{
+
+
+margin-top:20px;
+
+font-size:30px;
+
+
+}
+
+
+
+
+
+
+
+
 
 .hero{
 
+
 padding:35px;
 
+
 border-radius:20px;
+
 
 background:
 
@@ -648,9 +945,14 @@ var(--va-primary),
 
 );
 
+
 color:white;
 
+
 }
+
+
+
 
 
 
@@ -658,13 +960,20 @@ color:white;
 
 .hero h1{
 
+
 font-size:34px;
+
 
 margin:0;
 
+
 font-weight:800;
 
+
 }
+
+
+
 
 
 
@@ -672,11 +981,17 @@ font-weight:800;
 
 .hero p{
 
+
 margin-top:15px;
+
 
 opacity:.9;
 
+
 }
+
+
+
 
 
 
@@ -684,13 +999,20 @@ opacity:.9;
 
 .info{
 
+
 display:flex;
+
 
 gap:25px;
 
+
 margin-top:25px;
 
+
 }
+
+
+
 
 
 
@@ -698,7 +1020,9 @@ margin-top:25px;
 
 .rides{
 
+
 margin-top:40px;
+
 
 }
 
@@ -706,9 +1030,14 @@ margin-top:40px;
 
 
 
+
+
+
 .rides-grid{
 
+
 display:grid;
+
 
 grid-template-columns:
 
@@ -720,11 +1049,17 @@ minmax(280px,1fr)
 
 );
 
+
 gap:20px;
+
 
 margin-top:20px;
 
+
 }
+
+
+
 
 
 
@@ -732,13 +1067,19 @@ margin-top:20px;
 
 .empty{
 
+
 text-align:center;
+
 
 margin-top:30px;
 
+
 color:var(--va-text-secondary);
 
+
 }
+
+
 
 
 
@@ -760,27 +1101,35 @@ transform:rotate(360deg);
 
 
 
+
+
+
+
 @keyframes fade{
 
 
 from{
 
+
 opacity:0;
 
+
 transform:translateY(10px);
+
 
 }
 
 
 to{
 
+
 opacity:1;
 
-}
-
 
 }
 
+
+}
 
 
 

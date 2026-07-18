@@ -31,6 +31,9 @@ Sending request...
 
 
 
+
+
+
 <div
 v-if="requestStatus==='success'"
 class="success-box"
@@ -76,16 +79,48 @@ class="warning-box"
 
 
 <h2>
-Request already sent
+Request unavailable
 </h2>
 
 
 <p>
-Waiting for driver response.
+Request already sent or no seats available.
 </p>
 
 
 </div>
+
+
+
+
+
+
+
+<div
+v-if="requestStatus==='danger'"
+class="danger-box"
+>
+
+
+<div class="danger-icon">
+
+<Icon icon="mdi:account-cancel-outline"/>
+
+</div>
+
+
+<h2>
+Your ride
+</h2>
+
+
+<p>
+You cannot request your own ride.
+</p>
+
+
+</div>
+
 
 
 
@@ -296,6 +331,7 @@ No rides found
 
 
 
+
 <script setup>
 
 
@@ -423,9 +459,7 @@ response.data
 }
 catch(error){
 
-
 console.log(error);
-
 
 }
 
@@ -496,12 +530,21 @@ console.log(error);
 
 
 
+const message =
+
+error.response?.data?.message;
+
+
+
+
 
 if(
 
-error.response?.data?.message ===
+message === "Już wysłałeś prośbę"
 
-"Już wysłałeś prośbę"
+||
+
+message === "Brak wolnych miejsc"
 
 ){
 
@@ -529,11 +572,43 @@ return;
 
 
 
+
+
+if(
+
+message === "Nie możesz dołączyć do własnego przejazdu"
+
+){
+
+
+requestStatus.value="danger";
+
+
+
+setTimeout(()=>{
+
+
 requestStatus.value=null;
+
+
+},3000);
+
+
+
+return;
 
 
 }
 
+
+
+
+
+
+requestStatus.value=null;
+
+
+}
 
 
 };
@@ -553,6 +628,7 @@ return rides.value.filter(ride=>{
 
 
 const text =
+
 search.value.toLowerCase();
 
 
@@ -563,15 +639,21 @@ const routeMatch =
 
 
 ride.from
+
 .toLowerCase()
+
 .includes(text)
 
 
 
 ||
 
+
+
 ride.to
+
 .toLowerCase()
+
 .includes(text);
 
 
@@ -590,7 +672,7 @@ if(seatFilter.value==="1+ seats"){
 
 
 seatsMatch =
-ride.seats>=1;
+ride.seats >= 1;
 
 
 }
@@ -604,7 +686,7 @@ if(seatFilter.value==="3+ seats"){
 
 
 seatsMatch =
-ride.seats>=3;
+ride.seats >= 3;
 
 
 }
@@ -618,7 +700,7 @@ if(seatFilter.value==="5+ seats"){
 
 
 seatsMatch =
-ride.seats>=5;
+ride.seats >= 5;
 
 
 }
@@ -701,7 +783,8 @@ z-index:9999;
 
 .loader-box,
 .success-box,
-.warning-box{
+.warning-box,
+.danger-box{
 
 
 text-align:center;
@@ -756,7 +839,6 @@ background:#16a34a;
 color:white;
 
 padding:50px;
-
 
 border-radius:25px;
 
@@ -823,7 +905,6 @@ color:white;
 
 padding:50px;
 
-
 border-radius:25px;
 
 
@@ -845,7 +926,6 @@ box-shadow:
 
 width:80px;
 
-
 height:80px;
 
 
@@ -856,6 +936,73 @@ background:white;
 
 
 color:#f59e0b;
+
+
+display:flex;
+
+justify-content:center;
+
+
+align-items:center;
+
+
+margin:auto;
+
+
+font-size:45px;
+
+
+}
+
+
+
+
+
+
+
+.danger-box{
+
+
+background:#dc2626;
+
+color:white;
+
+
+padding:50px;
+
+
+border-radius:25px;
+
+
+box-shadow:
+
+0 20px 50px rgba(0,0,0,.2);
+
+
+}
+
+
+
+
+
+
+
+.danger-icon{
+
+
+width:80px;
+
+
+height:80px;
+
+
+border-radius:50%;
+
+
+background:white;
+
+
+color:#dc2626;
 
 
 display:flex;
@@ -882,12 +1029,33 @@ font-size:45px;
 
 
 .success-box h2,
-.warning-box h2{
+.warning-box h2,
+.danger-box h2{
 
 
 margin-top:20px;
 
+
 font-size:30px;
+
+
+}
+
+
+
+
+
+
+
+.success-box p,
+.warning-box p,
+.danger-box p{
+
+
+font-size:17px;
+
+
+opacity:.95;
 
 
 }

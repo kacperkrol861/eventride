@@ -11,6 +11,7 @@ class="request-overlay"
 
 
 
+
 <div
 v-if="requestStatus==='loading'"
 class="loader-box"
@@ -66,6 +67,7 @@ The driver will review your request.
 
 
 
+
 <div
 v-if="requestStatus==='warning'"
 class="warning-box"
@@ -80,13 +82,44 @@ class="warning-box"
 
 
 <h2>
-Request already sent
+Request unavailable
 </h2>
 
 
 <p>
-You already requested this ride.
-Waiting for driver response.
+You already requested this ride or there are no seats available.
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div
+v-if="requestStatus==='danger'"
+class="danger-box"
+>
+
+
+<div class="danger-icon">
+
+<Icon icon="mdi:account-cancel-outline"/>
+
+</div>
+
+
+<h2>
+Your ride
+</h2>
+
+
+<p>
+You cannot request your own ride.
 </p>
 
 
@@ -407,6 +440,7 @@ Join ride
 
 
 
+
 <script setup>
 
 
@@ -674,6 +708,7 @@ ride.value.id
 
 
 
+
 setTimeout(()=>{
 
 
@@ -681,7 +716,6 @@ requestStatus.value="success";
 
 
 },700);
-
 
 
 
@@ -698,8 +732,6 @@ router.push("/rides");
 
 
 
-
-
 }
 catch(error){
 
@@ -708,11 +740,24 @@ console.log(error);
 
 
 
+
+const message =
+
+error.response?.data?.message;
+
+
+
+
+
+
+
 if(
 
-error.response?.data?.message ===
+message === "Już wysłałeś prośbę"
 
-"Już wysłałeś prośbę"
+||
+
+message === "Brak wolnych miejsc"
 
 ){
 
@@ -735,6 +780,42 @@ return;
 
 
 }
+
+
+
+
+
+
+
+
+if(
+
+message === "Nie możesz dołączyć do własnego przejazdu"
+
+){
+
+
+requestStatus.value="danger";
+
+
+
+setTimeout(()=>{
+
+
+requestStatus.value=null;
+
+
+},3000);
+
+
+
+return;
+
+
+}
+
+
+
 
 
 
@@ -931,13 +1012,17 @@ position:fixed;
 
 inset:0;
 
+
 background:rgba(255,255,255,.96);
+
 
 display:flex;
 
 justify-content:center;
 
+
 align-items:center;
+
 
 z-index:9999;
 
@@ -949,12 +1034,15 @@ z-index:9999;
 
 
 
+
 .loader-box,
 .success-box,
-.warning-box{
+.warning-box,
+.danger-box{
 
 
 text-align:center;
+
 
 animation:fade .3s ease;
 
@@ -973,6 +1061,7 @@ animation:fade .3s ease;
 width:70px;
 
 height:70px;
+
 
 border-radius:50%;
 
@@ -1002,11 +1091,15 @@ margin:auto;
 
 background:#16a34a;
 
+
 color:white;
+
 
 padding:50px;
 
+
 border-radius:25px;
+
 
 box-shadow:
 
@@ -1026,7 +1119,9 @@ box-shadow:
 
 width:80px;
 
+
 height:80px;
+
 
 border-radius:50%;
 
@@ -1039,7 +1134,9 @@ color:#16a34a;
 
 display:flex;
 
+
 justify-content:center;
+
 
 align-items:center;
 
@@ -1058,17 +1155,20 @@ font-size:50px;
 
 
 
-
 .warning-box{
 
 
 background:#f59e0b;
 
+
 color:white;
+
 
 padding:50px;
 
+
 border-radius:25px;
+
 
 box-shadow:
 
@@ -1087,6 +1187,7 @@ box-shadow:
 
 
 width:80px;
+
 
 height:80px;
 
@@ -1123,11 +1224,82 @@ font-size:45px;
 
 
 
+.danger-box{
+
+
+background:#dc2626;
+
+
+color:white;
+
+
+padding:50px;
+
+
+border-radius:25px;
+
+
+box-shadow:
+
+0 20px 50px rgba(0,0,0,.2);
+
+
+}
+
+
+
+
+
+
+
+.danger-icon{
+
+
+width:80px;
+
+
+height:80px;
+
+
+border-radius:50%;
+
+
+background:white;
+
+
+color:#dc2626;
+
+
+display:flex;
+
+
+justify-content:center;
+
+
+align-items:center;
+
+
+margin:auto;
+
+
+font-size:45px;
+
+
+}
+
+
+
+
+
+
+
 .success-box h2,
-.warning-box h2{
+.warning-box h2,
+.danger-box h2{
 
 
 margin-top:20px;
+
 
 font-size:32px;
 
@@ -1141,10 +1313,12 @@ font-size:32px;
 
 
 .success-box p,
-.warning-box p{
+.warning-box p,
+.danger-box p{
 
 
 font-size:17px;
+
 
 opacity:.95;
 
@@ -1164,9 +1338,12 @@ opacity:.95;
 
 margin-bottom:20px;
 
+
 display:flex;
 
+
 align-items:center;
+
 
 gap:8px;
 
@@ -1184,7 +1361,9 @@ gap:8px;
 
 display:flex;
 
+
 justify-content:space-between;
+
 
 align-items:center;
 
@@ -1225,9 +1404,12 @@ color:white;
 
 font-size:34px;
 
+
 display:flex;
 
+
 gap:12px;
+
 
 align-items:center;
 
@@ -1245,7 +1427,9 @@ align-items:center;
 
 margin-top:10px;
 
+
 font-size:18px;
+
 
 opacity:.9;
 
@@ -1279,9 +1463,12 @@ margin-top:30px;
 
 margin-top:30px;
 
+
 display:flex;
 
+
 flex-direction:column;
+
 
 gap:20px;
 
@@ -1300,7 +1487,9 @@ gap:20px;
 
 display:flex;
 
+
 flex-direction:column;
+
 
 gap:15px;
 
@@ -1319,7 +1508,9 @@ gap:15px;
 
 display:flex;
 
+
 align-items:center;
+
 
 gap:10px;
 
@@ -1353,7 +1544,9 @@ color:var(--va-primary);
 
 to{
 
+
 transform:rotate(360deg);
+
 
 }
 
@@ -1373,6 +1566,7 @@ from{
 
 
 opacity:0;
+
 
 transform:translateY(10px);
 

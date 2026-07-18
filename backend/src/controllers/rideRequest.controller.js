@@ -665,23 +665,148 @@ const rejectRequest = async (req,res)=>{
 };
 
 
+const getMyRequests = async (req, res) => {
+
+    try{
+
+        const requests = await prisma.rideRequest.findMany({
+
+            where:{
+                userId:req.user.id
+            },
+
+            select:{
+                id:true,
+                rideId:true,
+                status:true,
+                createdAt:true
+            },
+
+            orderBy:{
+                createdAt:"desc"
+            }
+
+        });
+
+        res.json(requests);
+
+    }catch(error){
+
+        res.status(500).json({
+            error:error.message
+        });
+
+    }
+
+};
+
+const getMyRideRequests = async (req, res) => {
+
+    try {
+
+
+        const requests = await prisma.rideRequest.findMany({
+
+            where: {
+
+                ride: {
+
+                    driverId: req.user.id
+
+                },
+
+                status: "PENDING"
+
+            },
+
+
+            include: {
+
+
+                user: {
+
+                    select: {
+
+                        id: true,
+
+                        name: true,
+
+                        email: true
+
+                    }
+
+                },
+
+
+                ride: {
+
+                    select: {
+
+                        id: true,
+
+                        from: true,
+
+                        to: true,
+
+                        date: true,
+
+
+                        event: {
+
+                            select: {
+
+                                title: true
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+
+            },
+
+
+            orderBy: {
+
+                createdAt: "desc"
+
+            }
+
+
+        });
 
 
 
+        res.json(requests);
 
+
+
+    } catch(error) {
+
+
+        res.status(500).json({
+
+            error:error.message
+
+        });
+
+
+    }
+
+};
 
 
 
 module.exports = {
 
-
     createRequest,
-
     getRequests,
-
+    getMyRequests,
     acceptRequest,
-
+    getMyRideRequests,
     rejectRequest
-
 
 };

@@ -11,7 +11,11 @@ export const createRequest = (rideId)=>{
 };
 
 
+export const getMyRequests = ()=>{
 
+    return api.get("/my-requests");
+
+};
 
 
 export const getRequests = (rideId)=>{
@@ -42,6 +46,14 @@ export const rejectRequest = (requestId)=>{
 
     return api.patch(
         `/requests/${requestId}/reject`
+    );
+
+};
+
+export const getMyRideRequests = ()=>{
+
+    return api.get(
+        "/my-ride-requests"
     );
 
 };
