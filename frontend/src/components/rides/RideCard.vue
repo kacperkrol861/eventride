@@ -1,206 +1,258 @@
 <template>
 
-  <VaCard class="ride-card">
+<VaCard class="ride-card">
 
-    <VaCardContent>
 
+<VaCardContent>
 
-      <div class="route">
 
 
-        <div class="location">
+<div class="route">
 
-          <Icon
-            icon="mdi:map-marker-outline"
-          />
 
-          <span>
-            {{ ride.from }}
-          </span>
+<div class="location">
 
-        </div>
+<Icon
+icon="mdi:map-marker-outline"
+/>
 
+<span>
+{{ ride.from }}
+</span>
 
+</div>
 
-        <Icon
-          class="arrow"
-          icon="mdi:arrow-right"
-        />
 
 
 
-        <div class="location">
+<Icon
 
-          <Icon
-            icon="mdi:map-marker"
-          />
+class="arrow"
 
-          <span>
-            {{ ride.to }}
-          </span>
+icon="mdi:arrow-right"
 
-        </div>
+/>
 
 
-      </div>
 
 
+<div class="location">
 
 
-      <VaDivider />
+<Icon
 
+icon="mdi:map-marker"
 
+/>
 
 
-      <div class="info">
+<span>
+{{ ride.to }}
+</span>
 
 
-        <div class="item">
+</div>
 
-          <Icon
-            icon="mdi:calendar-outline"
-          />
 
-          <span>
-            {{ formatDate(ride.date) }}
-          </span>
+</div>
 
-        </div>
 
 
 
 
-        <div class="item">
+<VaDivider />
 
-          <Icon
-            icon="mdi:seat-passenger"
-          />
 
-          <span>
-            {{ ride.seats }} seats available
-          </span>
 
-        </div>
 
 
 
+<div class="info">
 
-        <div class="item">
 
-          <Icon
-            icon="mdi:account-circle-outline"
-          />
 
-          <span>
-            {{ ride.driver?.name || "Unknown driver" }}
-          </span>
+<div class="item">
 
-        </div>
+<Icon icon="mdi:calendar-outline"/>
 
+<span>
+{{ formatDate(ride.date) }}
+</span>
 
+</div>
 
-        <div
-          v-if="ride.event"
-          class="item"
-        >
 
-          <Icon
-            icon="mdi:calendar-star"
-          />
 
-          <span>
-            {{ ride.event.title }}
-          </span>
 
-        </div>
 
 
 
-      </div>
+<div class="item">
 
+<Icon icon="mdi:seat-passenger"/>
 
+<span>
+{{ ride.seats }} seats available
+</span>
 
+</div>
 
 
-      <div class="footer">
 
 
-        <VaChip
 
-          size="small"
 
-          :color="availability.color"
 
-        >
+<div class="item">
 
-          {{ availability.text }}
+<Icon icon="mdi:account-circle-outline"/>
 
-        </VaChip>
+<span>
+{{ ride.driver?.name || "Unknown driver" }}
+</span>
 
+</div>
 
 
 
 
-        <div class="actions">
 
 
-          <VaButton
 
-            size="small"
+<div
+v-if="ride.event"
+class="item"
+>
 
-            color="secondary"
 
-            @click="viewDetails"
+<Icon icon="mdi:calendar-star"/>
 
-          >
 
-            <Icon
-              icon="mdi:information-outline"
-            />
+<span>
+{{ ride.event.title }}
+</span>
 
-            View details
 
-          </VaButton>
+</div>
 
 
 
 
 
-          <VaButton
+</div>
 
-            size="small"
 
-            color="primary"
 
-            :disabled="ride.seats === 0"
 
-            @click="requestRide"
 
-          >
 
-            <Icon
-              icon="mdi:car-arrow-right"
-            />
 
-            {{ ride.seats === 0 ? "Full" : "Join ride" }}
 
-          </VaButton>
 
+<div class="footer">
 
-        </div>
 
 
-      </div>
 
 
+<VaChip
 
-    </VaCardContent>
+size="small"
 
+:color="availability.color"
 
-  </VaCard>
+>
+
+{{ availability.text }}
+
+</VaChip>
+
+
+
+
+
+
+
+
+<div class="actions">
+
+
+
+
+
+<VaButton
+
+size="small"
+
+color="secondary"
+
+@click="viewDetails"
+
+>
+
+
+<Icon icon="mdi:information-outline"/>
+
+
+View details
+
+
+</VaButton>
+
+
+
+
+
+
+
+<VaButton
+
+size="small"
+
+color="primary"
+
+:disabled="ride.seats===0"
+
+@click="requestRide"
+
+>
+
+
+<Icon icon="mdi:car-arrow-right"/>
+
+
+{{ ride.seats===0 ? "Full" : "Join ride" }}
+
+
+</VaButton>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+</div>
+
+
+
+
+
+</VaCardContent>
+
+
+</VaCard>
 
 
 </template>
+
+
+
 
 
 
@@ -209,18 +261,29 @@
 
 
 import {
-  computed
+
+computed
+
 } from "vue";
 
 
+
 import {
-  useRouter
+
+useRouter
+
 } from "vue-router";
 
 
+
 import {
-  Icon
+
+Icon
+
 } from "@iconify/vue";
+
+
+
 
 
 
@@ -228,17 +291,34 @@ const router = useRouter();
 
 
 
+
+
+
 const props = defineProps({
 
-  ride:{
+ride:{
 
-    type:Object,
+type:Object,
 
-    required:true
+required:true
 
-  }
+}
 
 });
+
+
+
+
+
+
+const emit = defineEmits([
+
+"request"
+
+]);
+
+
+
 
 
 
@@ -247,54 +327,56 @@ const props = defineProps({
 const availability = computed(()=>{
 
 
-  if(props.ride.seats === 0){
+
+if(props.ride.seats===0){
 
 
-    return {
+return {
 
-      text:"Full",
+text:"Full",
 
-      color:"danger"
+color:"danger"
 
-    };
-
-
-  }
+};
 
 
-
-
-
-  if(props.ride.seats <= 3){
-
-
-    return {
-
-      text:`Only ${props.ride.seats} left`,
-
-      color:"warning"
-
-    };
-
-
-  }
+}
 
 
 
 
 
-  return {
+
+if(props.ride.seats<=3){
 
 
-    text:"Available",
+return {
 
-    color:"success"
+text:`Only ${props.ride.seats} left`,
+
+color:"warning"
+
+};
 
 
-  };
+}
+
+
+
+
+
+return {
+
+text:"Available",
+
+color:"success"
+
+};
 
 
 });
+
+
 
 
 
@@ -305,45 +387,60 @@ const availability = computed(()=>{
 const formatDate=(date)=>{
 
 
-  return new Date(date)
+if(!date)
 
-    .toLocaleString(
+return "";
 
-      "en-US",
 
-      {
 
-        day:"numeric",
+return new Date(date)
 
-        month:"short",
+.toLocaleString(
 
-        year:"numeric",
+"en-US",
 
-        hour:"2-digit",
+{
 
-        minute:"2-digit"
+day:"numeric",
 
-      }
+month:"short",
 
-    );
+year:"numeric",
+
+hour:"2-digit",
+
+minute:"2-digit"
+
+}
+
+);
+
+
+
+};
+
+
+
+
+
+
+
+
+
+const viewDetails=()=>{
+
+
+router.push(
+
+`/rides/${props.ride.id}`
+
+);
 
 
 };
 
 
 
-
-
-
-const viewDetails = ()=>{
-
-
-  router.push(
-    `/rides/${props.ride.id}`
-  );
-
-
-};
 
 
 
@@ -353,13 +450,13 @@ const viewDetails = ()=>{
 const requestRide=()=>{
 
 
-  console.log(
+emit(
 
-    "Request ride:",
+"request",
 
-    props.ride.id
+props.ride
 
-  );
+);
 
 
 };
@@ -373,25 +470,15 @@ const requestRide=()=>{
 
 
 
+
 <style scoped>
 
 
-.ride-card {
+.ride-card{
 
+border-radius:18px;
 
-  border-radius:18px;
-
-  transition:.25s;
-
-}
-
-
-
-.ride-card:hover {
-
-
-  transform:translateY(-5px);
-
+transition:.25s;
 
 }
 
@@ -399,55 +486,9 @@ const requestRide=()=>{
 
 
 
-.route {
+.ride-card:hover{
 
-
-  display:flex;
-
-  align-items:center;
-
-  gap:12px;
-
-  font-weight:700;
-
-}
-
-
-
-
-
-.location {
-
-
-  display:flex;
-
-  align-items:center;
-
-  gap:7px;
-
-}
-
-
-
-
-
-.location svg {
-
-
-  color:var(--va-primary);
-
-
-}
-
-
-
-
-
-.arrow {
-
-
-  color:#94a3b8;
-
+transform:translateY(-5px);
 
 }
 
@@ -456,48 +497,16 @@ const requestRide=()=>{
 
 
 
-.info {
 
+.route{
 
-  display:flex;
+display:flex;
 
-  flex-direction:column;
+align-items:center;
 
-  gap:12px;
+gap:12px;
 
-
-}
-
-
-
-
-
-
-.item {
-
-
-  display:flex;
-
-  align-items:center;
-
-  gap:10px;
-
-  color:var(--va-text-secondary);
-
-  font-size:14px;
-
-
-}
-
-
-
-
-
-.item svg {
-
-
-  color:var(--va-primary);
-
+font-weight:700;
 
 }
 
@@ -506,17 +515,14 @@ const requestRide=()=>{
 
 
 
-.footer {
 
+.location{
 
-  margin-top:25px;
+display:flex;
 
-  display:flex;
+align-items:center;
 
-  justify-content:space-between;
-
-  align-items:center;
-
+gap:7px;
 
 }
 
@@ -524,12 +530,23 @@ const requestRide=()=>{
 
 
 
-.actions {
 
 
-  display:flex;
+.location svg{
 
-  gap:10px;
+color:var(--va-primary);
+
+}
+
+
+
+
+
+
+
+.arrow{
+
+color:#94a3b8;
 
 }
 
@@ -537,17 +554,99 @@ const requestRide=()=>{
 
 
 
-.actions button {
 
 
-  display:flex;
+.info{
 
-  align-items:center;
+display:flex;
 
-  gap:6px;
+flex-direction:column;
 
+gap:12px;
 
 }
+
+
+
+
+
+
+
+.item{
+
+display:flex;
+
+align-items:center;
+
+gap:10px;
+
+color:var(--va-text-secondary);
+
+font-size:14px;
+
+}
+
+
+
+
+
+
+
+.item svg{
+
+color:var(--va-primary);
+
+}
+
+
+
+
+
+
+
+.footer{
+
+margin-top:25px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+
+
+
+
+
+
+.actions{
+
+display:flex;
+
+gap:10px;
+
+}
+
+
+
+
+
+
+
+.actions button{
+
+display:flex;
+
+align-items:center;
+
+gap:6px;
+
+}
+
+
 
 
 
@@ -557,56 +656,46 @@ const requestRide=()=>{
 @media(max-width:600px){
 
 
-.route {
+.route{
 
+flex-direction:column;
 
-  flex-direction:column;
-
-  align-items:flex-start;
-
+align-items:flex-start;
 
 }
 
 
 
+.arrow{
 
-.arrow {
-
-
-  transform:rotate(90deg);
-
+transform:rotate(90deg);
 
 }
 
 
 
+.footer{
 
+flex-direction:column;
 
-.footer {
+gap:15px;
 
-
-  flex-direction:column;
-
-  gap:15px;
-
-  align-items:stretch;
-
+align-items:stretch;
 
 }
 
 
 
+.actions{
 
-.actions {
-
-
-  flex-direction:column;
+flex-direction:column;
 
 }
 
 
 
 }
+
 
 
 </style>

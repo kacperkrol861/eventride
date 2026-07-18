@@ -4,6 +4,108 @@
 
 
 
+<div
+v-if="requestStatus"
+class="request-overlay"
+>
+
+
+
+<div
+v-if="requestStatus==='loading'"
+class="loader-box"
+>
+
+
+<div class="spinner"></div>
+
+
+<h2>
+Sending request...
+</h2>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div
+v-if="requestStatus==='success'"
+class="success-box"
+>
+
+
+<div class="check">
+
+<Icon icon="mdi:check"/>
+
+</div>
+
+
+<h2>
+Request sent!
+</h2>
+
+
+<p>
+The driver will review your request.
+</p>
+
+
+</div>
+
+
+
+
+
+
+
+
+<div
+v-if="requestStatus==='warning'"
+class="warning-box"
+>
+
+
+<div class="warning-icon">
+
+<Icon icon="mdi:clock-alert-outline"/>
+
+</div>
+
+
+<h2>
+Request already sent
+</h2>
+
+
+<p>
+You already requested this ride.
+Waiting for driver response.
+</p>
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
 <VaButton
 
 flat
@@ -16,9 +118,8 @@ class="back-button"
 
 >
 
-<Icon
-icon="mdi:arrow-left"
-/>
+
+<Icon icon="mdi:arrow-left"/>
 
 
 Back to rides
@@ -31,7 +132,11 @@ Back to rides
 
 
 
+
+
+
 <section class="hero">
+
 
 <div>
 
@@ -45,6 +150,8 @@ Back to rides
 {{ ride?.to }}
 
 </h1>
+
+
 
 
 
@@ -65,6 +172,9 @@ Ride details
 
 
 </div>
+
+
+
 
 
 
@@ -136,7 +246,6 @@ Route
 
 
 
-
 <section class="content">
 
 
@@ -157,8 +266,9 @@ Ride information
 
 
 
-
 <div class="info">
+
+
 
 
 
@@ -253,12 +363,17 @@ color="primary"
 
 size="large"
 
-:disabled="ride?.seats===0"
+:disabled="
+
+ride?.seats===0 ||
+
+requestStatus
+
+"
 
 @click="requestRide"
 
 >
-
 
 
 <Icon icon="mdi:car-arrow-right"/>
@@ -274,6 +389,7 @@ Join ride
 
 
 
+
 </section>
 
 
@@ -282,9 +398,7 @@ Join ride
 
 </div>
 
-
 </template>
-
 
 
 
@@ -342,6 +456,14 @@ getCoordinates
 
 
 
+import {
+
+createRequest
+
+} from "@/api/request.api";
+
+
+
 import RideMap from "@/components/rides/RideMap.vue";
 
 
@@ -352,8 +474,8 @@ import RideMap from "@/components/rides/RideMap.vue";
 
 const route = useRoute();
 
-
 const router = useRouter();
+
 
 
 
@@ -361,8 +483,11 @@ const router = useRouter();
 const ride = ref(null);
 
 
-
 const mapPoints = ref(null);
+
+
+
+const requestStatus = ref(null);
 
 
 
@@ -379,7 +504,6 @@ try{
 
 
 const response = await getRides();
-
 
 
 
@@ -528,6 +652,109 @@ error
 
 
 
+const requestRide = async()=>{
+
+
+try{
+
+
+requestStatus.value="loading";
+
+
+
+
+
+await createRequest(
+
+ride.value.id
+
+);
+
+
+
+
+
+setTimeout(()=>{
+
+
+requestStatus.value="success";
+
+
+},700);
+
+
+
+
+
+
+
+setTimeout(()=>{
+
+
+router.push("/rides");
+
+
+},2500);
+
+
+
+
+
+}
+catch(error){
+
+
+console.log(error);
+
+
+
+if(
+
+error.response?.data?.message ===
+
+"Już wysłałeś prośbę"
+
+){
+
+
+requestStatus.value="warning";
+
+
+
+setTimeout(()=>{
+
+
+requestStatus.value=null;
+
+
+},3000);
+
+
+
+return;
+
+
+}
+
+
+
+requestStatus.value=null;
+
+
+}
+
+
+
+};
+
+
+
+
+
+
+
+
+
 const availability = computed(()=>{
 
 
@@ -650,33 +877,11 @@ minute:"2-digit"
 
 
 
+
 const goBack = ()=>{
 
 
 router.push("/rides");
-
-
-};
-
-
-
-
-
-
-
-
-
-const requestRide=()=>{
-
-
-console.log(
-
-"Request ride:",
-
-ride.value.id
-
-);
-
 
 
 };
@@ -719,6 +924,241 @@ animation:fade .3s ease;
 
 
 
+.request-overlay{
+
+
+position:fixed;
+
+inset:0;
+
+background:rgba(255,255,255,.96);
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+z-index:9999;
+
+
+}
+
+
+
+
+
+
+.loader-box,
+.success-box,
+.warning-box{
+
+
+text-align:center;
+
+animation:fade .3s ease;
+
+
+}
+
+
+
+
+
+
+
+.spinner{
+
+
+width:70px;
+
+height:70px;
+
+border-radius:50%;
+
+
+border:6px solid #ddd;
+
+
+border-top-color:var(--va-primary);
+
+
+animation:spin 1s linear infinite;
+
+
+margin:auto;
+
+
+}
+
+
+
+
+
+
+
+.success-box{
+
+
+background:#16a34a;
+
+color:white;
+
+padding:50px;
+
+border-radius:25px;
+
+box-shadow:
+
+0 20px 50px rgba(0,0,0,.2);
+
+
+}
+
+
+
+
+
+
+
+.check{
+
+
+width:80px;
+
+height:80px;
+
+border-radius:50%;
+
+
+background:white;
+
+
+color:#16a34a;
+
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+
+margin:auto;
+
+
+font-size:50px;
+
+
+}
+
+
+
+
+
+
+
+
+.warning-box{
+
+
+background:#f59e0b;
+
+color:white;
+
+padding:50px;
+
+border-radius:25px;
+
+box-shadow:
+
+0 20px 50px rgba(0,0,0,.2);
+
+
+}
+
+
+
+
+
+
+
+.warning-icon{
+
+
+width:80px;
+
+height:80px;
+
+
+border-radius:50%;
+
+
+background:white;
+
+
+color:#f59e0b;
+
+
+display:flex;
+
+
+justify-content:center;
+
+
+align-items:center;
+
+
+margin:auto;
+
+
+font-size:45px;
+
+
+}
+
+
+
+
+
+
+
+.success-box h2,
+.warning-box h2{
+
+
+margin-top:20px;
+
+font-size:32px;
+
+
+}
+
+
+
+
+
+
+
+.success-box p,
+.warning-box p{
+
+
+font-size:17px;
+
+opacity:.95;
+
+
+}
+
+
+
+
+
+
+
+
+
 .back-button{
 
 
@@ -748,9 +1188,12 @@ justify-content:space-between;
 
 align-items:center;
 
+
 padding:35px;
 
+
 border-radius:20px;
+
 
 background:
 
@@ -763,6 +1206,7 @@ var(--va-primary),
 #6c8cff
 
 );
+
 
 color:white;
 
@@ -898,6 +1342,23 @@ color:var(--va-primary);
 }
 
 
+
+
+
+
+
+
+@keyframes spin{
+
+
+to{
+
+transform:rotate(360deg);
+
+}
+
+
+}
 
 
 
