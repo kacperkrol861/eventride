@@ -2,149 +2,154 @@
 
 <VaDropdown placement="bottom-end">
 
+  <template #anchor>
 
-<template #anchor>
+    <div
+      class="bell"
+      @click="loadNotifications"
+    >
 
+      <Icon
+        icon="mdi:bell-outline"
+      />
 
-<div 
-class="bell"
-@click="loadNotifications"
->
 
+      <span
+        v-if="count > 0"
+        class="badge"
+      >
 
-<Icon
-icon="mdi:bell-outline"
-/>
+        {{ count }}
 
+      </span>
 
-<VaBadge
 
-v-if="count"
+    </div>
 
-:content="count"
+  </template>
 
-color="danger"
 
-/>
 
 
-</div>
+  <VaDropdownContent>
 
 
-</template>
+    <div class="notifications">
 
 
+      <h3>
+        Notifications
+      </h3>
 
 
 
-<VaDropdownContent>
 
 
-<div class="notifications">
+      <div
+        v-if="!requests.length"
+        class="empty"
+      >
 
+        No notifications
 
-<h3>
-Notifications
-</h3>
+      </div>
 
 
 
-<div
-v-if="!requests.length"
-class="empty"
->
 
-No notifications
 
-</div>
 
 
+      <div
+        v-for="item in requests.slice(0,3)"
+        :key="item.id"
+        class="notification"
+      >
 
 
 
+        <Icon
+          icon="mdi:account-plus"
+        />
 
 
-<div
-v-for="item in requests.slice(0,3)"
-:key="item.id"
-class="notification"
->
 
 
+        <div>
 
-<Icon
-icon="mdi:account-plus"
-/>
 
+          <strong>
 
+            {{ item.user?.name }}
+            wants to join
 
-<div>
+          </strong>
 
 
-<strong>
 
-{{ item.user?.name }}
 
-wants to join
+          <p>
 
-</strong>
+            {{ item.ride?.from }}
 
+            →
 
+            {{ item.ride?.to }}
 
-<p>
+          </p>
 
-{{ item.ride?.from }}
 
-→
 
-{{ item.ride?.to }}
 
-</p>
+          <span>
 
+            {{ item.status }}
 
+          </span>
 
-<span>
 
-{{ item.status }}
 
-</span>
 
+        </div>
 
 
-</div>
 
 
+      </div>
 
-</div>
 
 
 
 
 
 
+      <VaButton
 
-<VaButton
+        block
 
-block
+        size="small"
 
-size="small"
+        color="primary"
 
-color="primary"
+        @click="openRequests"
 
-@click="openRequests"
+      >
 
->
+        View more
 
-View more
 
-</VaButton>
+      </VaButton>
 
 
 
-</div>
 
 
-</VaDropdownContent>
+    </div>
+
+
+
+  </VaDropdownContent>
+
 
 
 </VaDropdown>
@@ -162,29 +167,46 @@ View more
 
 
 import {
-ref,
-computed,
-onMounted
+
+  ref,
+
+  computed,
+
+  onMounted
+
 } from "vue";
 
 
+
 import {
-useRouter
+
+  useRouter
+
 } from "vue-router";
 
 
+
 import {
-Icon
+
+  Icon
+
 } from "@iconify/vue";
 
 
+
 import {
-getMyRideRequests
+
+  getMyRideRequests
+
 } from "@/api/request.api";
 
 
 
+
+
 const router = useRouter();
+
+
 
 
 const requests = ref([]);
@@ -193,32 +215,48 @@ const requests = ref([]);
 
 
 
+
+
+
 const loadNotifications = async()=>{
 
-try{
 
-const response = await getMyRideRequests();
-
-
-console.log("MY RIDE REQUESTS:", response.data);
+  try{
 
 
-requests.value =
-Array.isArray(response.data)
-?
-response.data
-:
-[];
+    const response = await getMyRideRequests();
 
 
-}
-catch(error){
 
-console.log(error);
+    requests.value = Array.isArray(response.data)
 
-}
+      ?
+
+      response.data
+
+      :
+
+      [];
+
+
+
+  }
+
+
+  catch(error){
+
+
+    console.log(error);
+
+
+  }
+
+
 
 };
+
+
+
 
 
 
@@ -228,11 +266,12 @@ console.log(error);
 const count = computed(()=>{
 
 
-return requests.value.filter(
+  return requests.value.filter(
 
-r => r.status === "PENDING"
+    request => request.status === "PENDING"
 
-).length;
+  ).length;
+
 
 
 });
@@ -243,13 +282,16 @@ r => r.status === "PENDING"
 
 
 
+
+
 const openRequests = ()=>{
 
 
-router.push("/my-requests");
+  router.push("/my-ride-requests");
 
 
 };
+
 
 
 
@@ -269,21 +311,36 @@ onMounted(loadNotifications);
 
 
 
+
 <style scoped>
 
 
 .bell{
 
 
-position:relative;
+  position:relative;
 
-cursor:pointer;
 
-font-size:25px;
+  width:38px;
 
-display:flex;
 
-align-items:center;
+  height:38px;
+
+
+  display:flex;
+
+
+  align-items:center;
+
+
+  justify-content:center;
+
+
+  cursor:pointer;
+
+
+  transition:.2s;
+
 
 
 }
@@ -291,14 +348,94 @@ align-items:center;
 
 
 
-.bell :deep(.va-badge){
 
 
-position:absolute;
+.bell:hover{
 
-top:-8px;
 
-right:-12px;
+  transform:scale(1.08);
+
+
+
+}
+
+
+
+
+
+
+.bell svg{
+
+
+  font-size:25px;
+
+
+  color:#475569;
+
+
+
+}
+
+
+
+
+
+
+.badge{
+
+
+  position:absolute;
+
+
+  top:-3px;
+
+
+  right:-3px;
+
+
+
+  min-width:18px;
+
+
+  height:18px;
+
+
+  padding:0 5px;
+
+
+  border-radius:999px;
+
+
+
+  background:#ef4444;
+
+
+  color:white;
+
+
+
+  font-size:11px;
+
+
+  font-weight:700;
+
+
+
+  display:flex;
+
+
+  align-items:center;
+
+
+  justify-content:center;
+
+
+
+  border:2px solid white;
+
+
+  line-height:1;
+
 
 
 }
@@ -311,12 +448,15 @@ right:-12px;
 .notifications{
 
 
-width:340px;
+  width:340px;
 
-padding:15px;
+
+  padding:15px;
+
 
 
 }
+
 
 
 
@@ -325,9 +465,12 @@ padding:15px;
 .notifications h3{
 
 
-margin-bottom:15px;
+  margin-bottom:15px;
+
+
 
 }
+
 
 
 
@@ -336,16 +479,35 @@ margin-bottom:15px;
 .notification{
 
 
-display:flex;
+  display:flex;
 
-gap:12px;
 
-padding:12px 0;
+  gap:12px;
 
-border-bottom:1px solid #eee;
+
+  padding:12px 0;
+
+
+  border-bottom:1px solid #eee;
+
 
 
 }
+
+
+
+
+
+
+.notification:last-child{
+
+
+  border-bottom:none;
+
+
+
+}
+
 
 
 
@@ -354,12 +516,32 @@ border-bottom:1px solid #eee;
 .notification svg{
 
 
-font-size:24px;
+  font-size:22px;
 
-color:var(--va-primary);
+
+  color:var(--va-primary);
+
 
 
 }
+
+
+
+
+
+
+.notification strong{
+
+
+  display:block;
+
+
+  font-size:14px;
+
+
+
+}
+
 
 
 
@@ -368,12 +550,18 @@ color:var(--va-primary);
 .notification p{
 
 
-margin:5px 0;
+  margin:4px 0;
 
-font-size:14px;
+
+  font-size:13px;
+
+
+  color:#475569;
+
 
 
 }
+
 
 
 
@@ -382,9 +570,11 @@ font-size:14px;
 .notification span{
 
 
-font-size:12px;
+  font-size:12px;
 
-color:#64748b;
+
+  color:#64748b;
+
 
 
 }
@@ -393,14 +583,18 @@ color:#64748b;
 
 
 
+
 .empty{
 
 
-text-align:center;
+  text-align:center;
 
-padding:20px;
 
-color:#64748b;
+  padding:20px;
+
+
+  color:#64748b;
+
 
 
 }
