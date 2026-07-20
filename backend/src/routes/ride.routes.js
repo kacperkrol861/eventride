@@ -2,7 +2,8 @@ const express = require("express");
 
 const {
     createRide,
-    getRides
+    getRides,
+    getMyRides
 } = require("../controllers/ride.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -26,6 +27,10 @@ router.get(
     "/",
     getRides
 );
-
+router.get(
+    "/my-rides",
+    authMiddleware,
+    getMyRides
+);
 
 module.exports = router;

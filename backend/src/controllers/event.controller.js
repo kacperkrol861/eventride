@@ -129,10 +129,52 @@ const deleteEvent = async (req, res) => {
     }
 
 };
+const getMyEvents = async(req,res)=>{
 
+    try{
+
+        const events = await prisma.event.findMany({
+
+            where:{
+                creatorId:req.user.id
+            },
+
+
+            include:{
+
+                rides:true
+
+            },
+
+
+            orderBy:{
+
+                createdAt:"desc"
+
+            }
+
+        });
+
+
+        res.json(events);
+
+
+
+    }catch(error){
+
+        res.status(500).json({
+
+            error:error.message
+
+        });
+
+    }
+
+};
 
 module.exports = {
     createEvent,
     getEvents,
-    deleteEvent
+    deleteEvent,
+    getMyEvents
 };

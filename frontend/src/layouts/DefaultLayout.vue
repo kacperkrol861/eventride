@@ -2,391 +2,246 @@
 
 <div class="app-layout">
 
+  <VaNavbar class="navbar">
 
-<VaNavbar class="navbar">
+    <template #left>
 
+      <RouterLink
+        to="/dashboard"
+        class="logo"
+      >
 
-<template #left>
+        <span class="logo-mark">
+          E
+        </span>
 
+        EventRide
 
-<RouterLink
+      </RouterLink>
 
-to="/dashboard"
+    </template>
 
-class="logo"
 
->
 
 
-<span class="logo-mark">
 
-E
+    <template #center>
 
-</span>
+      <nav class="menu">
 
+        <RouterLink to="/dashboard">
+          Dashboard
+        </RouterLink>
 
-EventRide
+        <RouterLink to="/events">
+          Events
+        </RouterLink>
 
+        <RouterLink to="/rides">
+          Rides
+        </RouterLink>
 
-</RouterLink>
+      </nav>
 
+    </template>
 
-</template>
 
 
 
 
+    <template #right>
 
+      <NotificationBell />
 
+      <VaDropdown placement="bottom-end">
 
+        <template #anchor>
 
-<template #center>
+          <VaAvatar
+            color="primary"
+            size="36px"
+            class="avatar"
+          >
+            {{ userInitial }}
+          </VaAvatar>
 
+        </template>
 
-<nav class="menu">
 
 
-<RouterLink to="/dashboard">
 
-Dashboard
 
-</RouterLink>
+        <VaDropdownContent>
 
+          <div class="dropdown">
 
+            <div class="profile">
 
-<RouterLink to="/events">
+              <VaAvatar
+                color="primary"
+                size="42px"
+              >
+                {{ userInitial }}
+              </VaAvatar>
 
-Events
+              <div>
 
-</RouterLink>
+                <strong>
+                  {{ user?.name }}
+                </strong>
 
+                <span>
+                  {{ user?.email }}
+                </span>
 
+              </div>
 
-<RouterLink to="/rides">
+            </div>
 
-Rides
+            <VaDivider />
 
-</RouterLink>
 
 
+            <div class="menu-section">
 
-</nav>
+              <div
+                class="menu-item"
+                @click="router.push('/account')"
+              >
 
+                <Icon icon="mdi:account-circle-outline" />
 
-</template>
+                <span>
+                  My account
+                </span>
 
+              </div>
 
 
 
 
 
+              <div
+                class="menu-item"
+                @click="router.push('/my-rides')"
+              >
 
+                <Icon icon="mdi:car-outline" />
 
+                <span>
+                  My rides
+                </span>
 
-<template #right>
+              </div>
 
 
 
-<NotificationBell />
 
 
+              <div
+                class="menu-item"
+                @click="router.push('/my-events')"
+              >
 
+                <Icon icon="mdi:calendar-star" />
 
+                <span>
+                  My events
+                </span>
 
+              </div>
 
-<VaDropdown placement="bottom-end">
+            </div>
 
+            <VaDivider />
 
+            <VaButton
+              preset="secondary"
+              size="small"
+              block
+              @click="logout"
+            >
+              Logout
+            </VaButton>
 
-<template #anchor>
+          </div>
 
+        </VaDropdownContent>
 
-<VaAvatar
+      </VaDropdown>
 
-color="primary"
+    </template>
 
-size="36px"
+  </VaNavbar>
 
-class="avatar"
 
->
 
 
-{{ userInitial }}
 
+  <main class="content">
 
-</VaAvatar>
+    <RouterView />
 
-
-</template>
-
-
-
-
-
-
-
-<VaDropdownContent>
-
-
-
-<div class="dropdown">
-
-
-
-
-
-
-<div class="profile">
-
-
-
-<VaAvatar
-
-color="primary"
-
-size="42px"
-
->
-
-
-{{ userInitial }}
-
-
-</VaAvatar>
-
-
-
-
-
-<div>
-
-
-
-<strong>
-
-{{ user?.name }}
-
-</strong>
-
-
-
-
-<span>
-
-{{ user?.email }}
-
-</span>
-
-
+  </main>
 
 </div>
 
-
-
-</div>
-
-
-
-
-
-
-
-<VaDivider />
-
-
-
-
-
-
-
-<VaButton
-
-preset="secondary"
-
-size="small"
-
-block
-
-@click="logout"
-
->
-
-
-Logout
-
-
-</VaButton>
-
-
-
-
-
-
-</div>
-
-
-
-
-</VaDropdownContent>
-
-
-
-
-</VaDropdown>
-
-
-
-
-
 </template>
-
-
-
-
-
-</VaNavbar>
-
-
-
-
-
-
-
-<main class="content">
-
-
-<RouterView />
-
-
-</main>
-
-
-
-
-
-</div>
-
-
-</template>
-
-
-
-
-
-
-
-
 
 <script setup>
 
-
 import {
-
-computed
-
+  computed
 } from "vue";
 
-
-
 import {
-
-useRouter
-
+  useRouter
 } from "vue-router";
 
-
+import {
+  Icon
+} from "@iconify/vue";
 
 import {
-
-useAuthStore
-
+  useAuthStore
 } from "@/stores/auth.store";
-
-
 
 import NotificationBell from "@/components/notifications/NotificationBell.vue";
 
-
-
-
-
-
 const auth = useAuthStore();
-
-
 
 const router = useRouter();
 
+const user = computed(() => {
 
-
-
-
-
-const user = computed(()=>{
-
-
-return auth.user;
-
+  return auth.user;
 
 });
 
+const userInitial = computed(() => {
 
-
-
-
-
-
-const userInitial = computed(()=>{
-
-
-return user.value?.name
-
-?.charAt(0)
-
-?.toUpperCase();
-
+  return user.value?.name
+    ?.charAt(0)
+    ?.toUpperCase();
 
 });
 
+const logout = () => {
 
-
-
-
-
-
-
-const logout = ()=>{
-
-
-router.push("/logout");
-
+  router.push("/logout");
 
 };
-
-
-
 
 </script>
 
 
-
-
-
-
-
-
-
 <style scoped>
-
 
 .app-layout {
 
+  min-height:100vh;
 
-min-height:100vh;
-
-background:#f8fafc;
-
+  background:#f8fafc;
 
 }
 
@@ -398,23 +253,17 @@ background:#f8fafc;
 
 .navbar {
 
+  height:68px;
 
-height:68px;
+  padding:0 32px;
 
+  background:rgba(255,255,255,.9);
 
-padding:0 32px;
+  backdrop-filter:blur(12px);
 
+  box-shadow:
 
-background:rgba(255,255,255,.9);
-
-
-backdrop-filter:blur(12px);
-
-
-box-shadow:
-
-0 2px 15px rgba(0,0,0,.06);
-
+  0 2px 15px rgba(0,0,0,.06);
 
 }
 
@@ -426,15 +275,11 @@ box-shadow:
 
 .navbar :deep(.va-navbar__right){
 
+  display:flex;
 
-display:flex;
+  align-items:center;
 
-
-align-items:center;
-
-
-gap:18px;
-
+  gap:18px;
 
 }
 
@@ -446,30 +291,21 @@ gap:18px;
 
 .logo {
 
+  display:flex;
 
-display:flex;
+  align-items:center;
 
+  gap:10px;
 
-align-items:center;
+  font-size:21px;
 
+  font-weight:800;
 
-gap:10px;
+  letter-spacing:-.5px;
 
+  color:var(--va-primary);
 
-font-size:21px;
-
-
-font-weight:800;
-
-
-letter-spacing:-.5px;
-
-
-color:var(--va-primary);
-
-
-text-decoration:none;
-
+  text-decoration:none;
 
 }
 
@@ -481,36 +317,25 @@ text-decoration:none;
 
 .logo-mark {
 
+  width:32px;
 
-width:32px;
+  height:32px;
 
+  display:flex;
 
-height:32px;
+  align-items:center;
 
+  justify-content:center;
 
-display:flex;
+  border-radius:10px;
 
+  background:var(--va-primary);
 
-align-items:center;
+  color:white;
 
+  font-size:18px;
 
-justify-content:center;
-
-
-border-radius:10px;
-
-
-background:var(--va-primary);
-
-
-color:white;
-
-
-font-size:18px;
-
-
-font-weight:800;
-
+  font-weight:800;
 
 }
 
@@ -522,15 +347,11 @@ font-weight:800;
 
 .menu {
 
+  display:flex;
 
-display:flex;
+  align-items:center;
 
-
-align-items:center;
-
-
-gap:36px;
-
+  gap:36px;
 
 }
 
@@ -542,24 +363,17 @@ gap:36px;
 
 .menu a {
 
+  position:relative;
 
-position:relative;
+  color:#64748b;
 
+  text-decoration:none;
 
-color:#64748b;
+  font-size:15px;
 
+  font-weight:600;
 
-text-decoration:none;
-
-
-font-size:15px;
-
-
-font-weight:600;
-
-
-transition:.25s;
-
+  transition:.25s;
 
 }
 
@@ -571,9 +385,7 @@ transition:.25s;
 
 .menu a:hover {
 
-
-color:var(--va-primary);
-
+  color:var(--va-primary);
 
 }
 
@@ -585,9 +397,7 @@ color:var(--va-primary);
 
 .menu a.router-link-active {
 
-
-color:var(--va-primary);
-
+  color:var(--va-primary);
 
 }
 
@@ -599,30 +409,21 @@ color:var(--va-primary);
 
 .menu a.router-link-active::after {
 
+  content:"";
 
-content:"";
+  position:absolute;
 
+  left:0;
 
-position:absolute;
+  bottom:-10px;
 
+  width:100%;
 
-left:0;
+  height:3px;
 
+  border-radius:20px;
 
-bottom:-10px;
-
-
-width:100%;
-
-
-height:3px;
-
-
-border-radius:20px;
-
-
-background:var(--va-primary);
-
+  background:var(--va-primary);
 
 }
 
@@ -634,12 +435,9 @@ background:var(--va-primary);
 
 .avatar {
 
+  cursor:pointer;
 
-cursor:pointer;
-
-
-transition:.25s;
-
+  transition:.25s;
 
 }
 
@@ -651,9 +449,7 @@ transition:.25s;
 
 .avatar:hover {
 
-
-transform:scale(1.08);
-
+  transform:scale(1.08);
 
 }
 
@@ -665,18 +461,13 @@ transform:scale(1.08);
 
 .content {
 
+  width:100%;
 
-width:100%;
+  max-width:1400px;
 
+  margin:auto;
 
-max-width:1400px;
-
-
-margin:auto;
-
-
-padding:32px;
-
+  padding:32px;
 
 }
 
@@ -688,12 +479,9 @@ padding:32px;
 
 .dropdown {
 
+  min-width:280px;
 
-min-width:260px;
-
-
-padding:18px;
-
+  padding:18px;
 
 }
 
@@ -705,15 +493,11 @@ padding:18px;
 
 .profile {
 
+  display:flex;
 
-display:flex;
+  align-items:center;
 
-
-align-items:center;
-
-
-gap:12px;
-
+  gap:12px;
 
 }
 
@@ -725,12 +509,9 @@ gap:12px;
 
 .profile strong {
 
+  display:block;
 
-display:block;
-
-
-font-size:15px;
-
+  font-size:15px;
 
 }
 
@@ -742,22 +523,101 @@ font-size:15px;
 
 .profile span {
 
+  display:block;
 
-display:block;
+  margin-top:3px;
 
+  font-size:13px;
 
-margin-top:3px;
-
-
-font-size:13px;
-
-
-color:#64748b;
-
+  color:#64748b;
 
 }
 
 
+
+
+
+
+
+.menu-section {
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:5px;
+
+  margin:12px 0;
+
+}
+
+
+
+
+
+
+
+.menu-item {
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  padding:11px 12px;
+
+  border-radius:10px;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+  color:#334155;
+
+  font-weight:600;
+
+}
+
+
+
+
+
+
+
+.menu-item:hover {
+
+  background:#f1f5f9;
+
+  color:var(--va-primary);
+
+}
+
+
+
+
+
+
+
+.menu-item svg {
+
+  font-size:22px;
+
+  color:var(--va-primary);
+
+}
+
+
+
+
+
+
+
+.menu-item span {
+
+  font-size:14px;
+
+}
 
 
 
@@ -768,31 +628,21 @@ color:#64748b;
 @media(max-width:900px){
 
 
-
 .navbar {
 
-
-padding:0 20px;
-
+  padding:0 20px;
 
 }
-
-
 
 
 .menu {
 
-
-gap:20px;
-
+  gap:20px;
 
 }
 
 
-
 }
-
-
 
 
 
@@ -803,83 +653,56 @@ gap:20px;
 @media(max-width:768px){
 
 
-
 .navbar {
 
-
-padding:0 16px;
-
+  padding:0 16px;
 
 }
-
-
 
 
 
 .logo {
 
-
-font-size:18px;
-
+  font-size:18px;
 
 }
-
-
 
 
 
 .logo-mark {
 
+  width:28px;
 
-width:28px;
-
-
-height:28px;
-
+  height:28px;
 
 }
-
-
 
 
 
 .menu {
 
-
-display:none;
-
+  display:none;
 
 }
-
-
 
 
 
 .content {
 
-
-padding:20px;
-
+  padding:20px;
 
 }
-
-
 
 
 
 .dropdown {
 
-
-min-width:220px;
-
+  min-width:240px;
 
 }
 
 
-
 }
-
-
 
 
 

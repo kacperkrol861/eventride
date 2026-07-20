@@ -17,6 +17,9 @@ import RideDetailView from "../views/rides/RideDetailView.vue";
 import RideView from "../views/rides/RideView.vue";
 import CreateRideView from "../views/rides/CreateRideView.vue";
 import myRideRequestView from "../views/rides/myRideRequestView.vue";
+import AccountView from "../views/account/AccountView.vue";
+import MyRidesView from "../views/rides/MyRidesView.vue";
+import MyEventsView from "../views/events/MyEventsView.vue";
 
 const router = createRouter({
 
@@ -101,8 +104,19 @@ const router = createRouter({
                 {
                      path:"/my-ride-requests",
                     component: myRideRequestView
+                },
+                {
+                    path:"account",
+                    component:AccountView
+                },
+                {
+                    path:"my-rides",
+                    component:MyRidesView
+                },
+                {
+                    path:"my-events",
+                    component:MyEventsView
                 }
-
             ]
 
         }

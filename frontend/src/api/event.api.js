@@ -11,3 +11,9 @@ export const createEvent = (data) => {
 export const deleteEvent = (id) => {
   return api.delete(`/events/${id}`);
 };
+
+export const getMyEvents = ()=>{
+
+    return api.get("/events/my-events");
+
+};

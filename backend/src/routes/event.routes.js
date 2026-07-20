@@ -3,7 +3,8 @@ const express = require("express");
 const {
     createEvent,
     getEvents,
-    deleteEvent
+    deleteEvent,
+    getMyEvents
 } = require("../controllers/event.controller");
 
 const authMiddleware = require("../middleware/auth.middleware");
@@ -21,7 +22,8 @@ router.post(
     "/",
     authMiddleware,
     validate(createEventSchema),
-    createEvent
+    createEvent,
+    getMyEvents
 );
 
 
@@ -34,6 +36,12 @@ router.delete(
     "/:id",
     authMiddleware,
     deleteEvent
+);
+
+router.get(
+    "/my-events",
+    authMiddleware,
+    getMyEvents
 );
 
 module.exports = router;

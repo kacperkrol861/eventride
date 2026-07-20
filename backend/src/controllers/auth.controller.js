@@ -123,9 +123,86 @@ const login = async (req, res) => {
     }
 
 };
+const getAccountStatistics = async (req, res) => {
 
+    try {
+
+        const userId = req.user.id;
+
+        const [
+            createdRides,
+            eventsCreated,
+            joinedRides,
+            pendingRequests,
+            acceptedRequests,
+            rejectedRequests
+        ] = await Promise.all([
+
+            prisma.ride.count({
+                where: {
+                    driverId: userId
+                }
+            }),
+
+            prisma.event.count({
+                where: {
+                    creatorId: userId
+                }
+            }),
+
+            prisma.rideRequest.count({
+                where: {
+                    userId,
+                    status: "ACCEPTED"
+                }
+            }),
+
+            prisma.rideRequest.count({
+                where: {
+                    userId,
+                    status: "PENDING"
+                }
+            }),
+
+            prisma.rideRequest.count({
+                where: {
+                    userId,
+                    status: "ACCEPTED"
+                }
+            }),
+
+            prisma.rideRequest.count({
+                where: {
+                    userId,
+                    status: "REJECTED"
+                }
+            })
+
+        ]);
+
+        res.json({
+
+            createdRides,
+            eventsCreated,
+            joinedRides,
+            pendingRequests,
+            acceptedRequests,
+            rejectedRequests
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+            error: error.message
+        });
+
+    }
+
+};
 
 module.exports = {
     register,
-    login
+    login,
+    getAccountStatistics
 };
